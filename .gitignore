@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.friendsdk/
+playwright-report/
+test-results/
+*.log

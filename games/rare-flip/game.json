@@ -1,0 +1,17 @@
+{
+  "name": "Rare Flip",
+  "consumable": "Coin Flip",
+  "price": "2000000000000000000000",
+  "outcomes": [
+    {
+      "name": "WIN",
+      "chanceBps": 5000,
+      "reward": "3680000000000000000000"
+    },
+    {
+      "name": "LOSE",
+      "chanceBps": 5000,
+      "reward": "0"
+    }
+  ]
+}
