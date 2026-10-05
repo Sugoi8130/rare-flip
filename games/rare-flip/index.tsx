@@ -45,9 +45,9 @@ function drawStar(ctx: CanvasRenderingContext2D, x: number, y: number, radius: n
 
 function drawCoin(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, face: Side, scaleX = 1) {
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(Math.max(.07, Math.abs(scaleX)), 1);
-  ctx.shadowColor = "#ffb62e"; ctx.shadowBlur = 22; ctx.shadowOffsetY = 8;
+  octagon(ctx, 8, 12, radius); ctx.fillStyle = "#4a174d"; ctx.fill();
   octagon(ctx, 0, 0, radius); ctx.fillStyle = "#8d4216"; ctx.fill();
-  ctx.shadowBlur = 0; octagon(ctx, 0, -5, radius - 5); ctx.fillStyle = "#ffb52d"; ctx.fill();
+  octagon(ctx, 0, -5, radius - 5); ctx.fillStyle = "#ffb52d"; ctx.fill();
   octagon(ctx, 0, -7, radius - 13); ctx.fillStyle = "#ffe568"; ctx.fill();
   ctx.fillStyle = "#fff1a2"; ctx.fillRect(-radius * .46, -radius * .69, radius * .65, 6);
   ctx.fillStyle = "#e68a1e"; ctx.fillRect(-radius * .62, radius * .45, radius * 1.24, 7);
@@ -86,7 +86,7 @@ function drawBanner(ctx: CanvasRenderingContext2D, x: number, sprites: Generatio
 }
 
 function paintArcade(ctx: CanvasRenderingContext2D, sprites: GenerationSprites | null, phase: Phase, landed: Side | null, started: number, now: number, reducedMotion: boolean) {
-  ctx.clearRect(0, 0, 960, 372); ctx.imageSmoothingEnabled = false;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 480, 186); ctx.scale(.5, .5); ctx.imageSmoothingEnabled = false;
   ctx.fillStyle = "#10051f"; ctx.fillRect(0, 0, 960, 372);
   ctx.fillStyle = "#251044"; ctx.fillRect(0, 0, 960, 180);
   ctx.fillStyle = "#32135a"; ctx.beginPath(); ctx.moveTo(385, 0); ctx.lineTo(575, 0); ctx.lineTo(650, 280); ctx.lineTo(310, 280); ctx.closePath(); ctx.fill();
@@ -125,7 +125,7 @@ function ArcadeScene({ sprites, phase, landed, paused, reducedMotion }: { sprite
     const render = (now: number) => { paintArcade(ctx, sprites, phase, landed, started.current, paused ? started.current : now, reducedMotion); frame = requestAnimationFrame(render); };
     frame = requestAnimationFrame(render); return () => cancelAnimationFrame(frame);
   }, [sprites, phase, landed, paused, reducedMotion]);
-  return <canvas ref={canvas} width="960" height="372" aria-label="Rare Friend đứng trước máy tung xu trong arcade" />;
+  return <canvas ref={canvas} width="480" height="186" aria-label="Rare Friend đứng trước máy tung xu trong arcade" />;
 }
 
 function RabbitMark() {
