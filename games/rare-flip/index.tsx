@@ -18,8 +18,8 @@ const opposite = (side: Side): Side => side === "heads" ? "tails" : "heads";
 const sideLabel = (side: Side) => side === "heads" ? "NGỬA" : "SẤP";
 const money = (value: bigint) => `${formatGameAmount(value, 18)} RF`;
 
-function PixelFriend({ sprites, tossing }: { sprites: GenerationSprites | null; tossing: boolean }) {
-  const rows = sprites ? spriteFrame(sprites, "up", tossing, tossing ? 3 : 0).frame.rows : null;
+function FriendSprite({ sprites, tossing = false, className = "" }: { sprites: GenerationSprites | null; tossing?: boolean; className?: string }) {
+  const rows = sprites ? spriteFrame(sprites, "down", tossing, tossing ? 3 : 0).frame.rows : null;
   const pixels = useMemo(() => {
     if (!rows) return null;
     const black = new Set<string>();
@@ -33,23 +33,20 @@ function PixelFriend({ sprites, tossing }: { sprites: GenerationSprites | null; 
     });
     return { black: [...black], outline: [...outline] };
   }, [rows]);
-  return <div className="rf-character" data-tossing={tossing || undefined} aria-label="Rare Friend đang tung xu">
-    {pixels ? <svg viewBox="-1 -1 18 18" shapeRendering="crispEdges" aria-hidden="true">
-      <g className="rf-sprite-outline">{pixels.outline.map(key => { const [x, y] = key.split(","); return <rect key={key} x={x} y={y} width="1" height="1" />; })}</g>
-      <g className="rf-sprite-fill">{pixels.black.map(key => { const [x, y] = key.split(","); return <rect key={key} x={x} y={y} width="1" height="1" />; })}</g>
-    </svg> : <div className="rf-character-placeholder" aria-hidden="true"><i /><i /><i /></div>}
-    <span className="rf-hand" aria-hidden="true" />
+  return <div className={`wallet-friend ${className}`} data-tossing={tossing || undefined} aria-hidden="true">
+    {pixels ? <svg viewBox="-1 -1 18 18" shapeRendering="crispEdges">
+      <g className="friend-outline">{pixels.outline.map(key => { const [x, y] = key.split(","); return <rect key={key} x={x} y={y} width="1" height="1" />; })}</g>
+      <g className="friend-fill">{pixels.black.map(key => { const [x, y] = key.split(","); return <rect key={key} x={x} y={y} width="1" height="1" />; })}</g>
+    </svg> : <span className="friend-loading">···</span>}
   </div>;
 }
 
-function Coin({ phase, landed }: { phase: Phase; landed: Side | null }) {
-  return <div className="coin-flight" data-phase={phase}>
-    <div className="pixel-coin" data-face={landed ?? "heads"} aria-label={landed ? `Kết quả ${sideLabel(landed)}` : "Đồng xu pixel"}>
-      <div className="coin-face coin-heads"><span>RF</span><small>NGỬA</small></div>
-      <div className="coin-face coin-tails"><span>◆</span><small>SẤP</small></div>
-      <div className="coin-edge" />
+function ConceptCoin({ phase, landed }: { phase: Phase; landed: Side | null }) {
+  return <div className="concept-coin-anchor" data-phase={phase} data-result={landed ?? undefined} aria-label={landed ? `Kết quả ${sideLabel(landed)}` : "Đồng xu Rare Flip"}>
+    <div className="concept-coin-token">
+      <span className="concept-coin-face concept-heads" />
+      <span className="concept-coin-face concept-tails" />
     </div>
-    <div className="coin-shadow" aria-hidden="true" />
   </div>;
 }
 
@@ -61,6 +58,7 @@ export default function RareFlip({ friendId, client, paused }: GameComponentProp
   const [result, setResult] = useState<GamePlay | null>(null);
   const [landed, setLanded] = useState<Side | null>(null);
   const [busy, setBusy] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("Chọn SẤP hoặc NGỬA để bắt đầu.");
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -76,7 +74,7 @@ export default function RareFlip({ friendId, client, paused }: GameComponentProp
       if (!alive.current) return;
       if (state.friendId !== friendId) throw new Error("Phiên game không khớp với Rare Friend đã chọn.");
       setSnapshot(state); setSprites(art);
-      if (state.plays.some(play => play.outcomeId === null)) setMessage("Có một lượt tung đang chờ. Tiếp tục lượt này mà không mất thêm cược.");
+      if (state.plays.some(play => play.outcomeId === null)) setMessage("Có một lượt tung đang chờ. Tiếp tục mà không mất thêm cược.");
     }).catch(cause => { if (alive.current) setError(cause instanceof Error ? cause.message : "Không thể tải game."); });
     return () => {
       alive.current = false; preference.removeEventListener("change", updateMotion);
@@ -91,7 +89,7 @@ export default function RareFlip({ friendId, client, paused }: GameComponentProp
   }
 
   async function flip() {
-    if (!snapshot || !choice || paused || lock.current) return;
+    if (!snapshot || !choice || paused || rulesOpen || lock.current) return;
     lock.current = true; setBusy(true); setError(""); setResult(null); setLanded(null); setPhase("working");
     try {
       const pending = snapshot.plays.find(play => play.outcomeId === null);
@@ -106,24 +104,20 @@ export default function RareFlip({ friendId, client, paused }: GameComponentProp
       const won = settled.outcomeId === 1;
       const finalSide = won ? choice : opposite(choice);
       setResult(settled); setLanded(finalSide); setPhase("flipping"); setMessage("Đồng xu đang xoay...");
-      const delay = reducedMotion ? 250 : 2_700;
       timer.current = window.setTimeout(() => {
         if (!alive.current) return;
         setPhase("result");
-        setMessage(won ? `Thắng! Nhận ròng ${money(NET)} sau phí ${money(FEE)}.` : `Thua. Đồng xu ra ${sideLabel(finalSide)}.`);
-      }, delay);
+        setMessage(won ? `WIN · Nhận ròng ${money(NET)} sau phí ${money(FEE)}.` : `LOSE · Đồng xu ra ${sideLabel(finalSide)}.`);
+      }, reducedMotion ? 250 : 2_700);
       await refresh();
     } catch (cause) {
-      setPhase("idle");
-      setError(cause instanceof Error ? cause.message : "Lượt tung không hoàn tất.");
+      setPhase("idle"); setError(cause instanceof Error ? cause.message : "Lượt tung không hoàn tất.");
       try { await refresh(); } catch { /* keep the actionable error */ }
-    } finally {
-      lock.current = false; if (alive.current) setBusy(false);
-    }
+    } finally { lock.current = false; if (alive.current) setBusy(false); }
   }
 
   async function claim() {
-    if (!snapshot || snapshot.inventory[0] === 0n || paused || lock.current) return;
+    if (!snapshot || snapshot.inventory[0] === 0n || paused || rulesOpen || lock.current) return;
     lock.current = true; setBusy(true); setError("");
     try {
       await client.redeem(1, snapshot.inventory[0]);
@@ -133,7 +127,7 @@ export default function RareFlip({ friendId, client, paused }: GameComponentProp
   }
 
   function nextRound() {
-    if (busy || paused) return;
+    if (busy || paused || rulesOpen) return;
     setChoice(null); setResult(null); setLanded(null); setPhase("idle"); setError(""); setMessage("Chọn SẤP hoặc NGỬA để bắt đầu lượt mới.");
   }
 
@@ -143,50 +137,53 @@ export default function RareFlip({ friendId, client, paused }: GameComponentProp
   const canAfford = snapshot.rfBalance >= definition.price;
   const hasBacking = snapshot.freeStake >= maximumPrize(definition);
   const unclaimed = snapshot.inventory[0] ?? 0n;
-  const actionDisabled = paused || busy || phase === "flipping" || phase === "result" || !choice || (!pending && snapshot.consumables === 0n && (!canAfford || !hasBacking));
+  const unavailable = paused || rulesOpen || busy || phase === "flipping" || phase === "working";
+  const flipDisabled = unavailable || phase === "result" || !choice || (!pending && snapshot.consumables === 0n && (!canAfford || !hasBacking));
+  const actionLabel = phase === "result" ? unclaimed > 0n ? `NHẬN ${money(unclaimed * NET)}` : "LƯỢT MỚI" : pending ? "TIẾP TỤC LƯỢT TUNG" : busy ? "ĐANG XỬ LÝ..." : "TUNG XU · 2.000 RF";
+  const action = phase === "result" ? unclaimed > 0n ? () => void claim() : nextRound : () => void flip();
 
-  return <main className="rare-flip" data-paused={paused || undefined} data-reduced-motion={reducedMotion || undefined} aria-label="Rare Flip" aria-busy={busy}>
-    <header className="game-header">
-      <div><span className="eyebrow">RARE FRIENDS ARCADE</span><h1>RARE FLIP</h1></div>
-      <div className="balance-panel"><small>SỐ DƯ MÔ PHỎNG</small><strong data-testid="balance">{money(snapshot.rfBalance)}</strong></div>
-    </header>
+  return <main className="rare-flip" data-paused={paused || rulesOpen || undefined} data-reduced-motion={reducedMotion || undefined} aria-label="Rare Flip" aria-busy={busy}>
+    <section className="concept-board" aria-label="Sân khấu Rare Flip">
+      <div className="balance-live" data-testid="balance">{money(snapshot.rfBalance)}</div>
+      <button type="button" className="hotspot rules-hotspot" onClick={() => setRulesOpen(true)} disabled={paused || busy} aria-label="RULES" />
 
-    <section className="game-stage">
-      <div className="floor-grid" aria-hidden="true" />
-      <div className="neon-sign sign-left" aria-hidden="true">50</div><div className="neon-sign sign-right" aria-hidden="true">50</div>
-      <div className="flip-table" aria-hidden="true"><span>CHOOSE</span><b>◆</b><span>FLIP</span></div>
-      <Coin phase={phase} landed={landed} />
-      <PixelFriend sprites={sprites} tossing={phase === "working" || phase === "flipping"} />
-      <div className="character-shadow" aria-hidden="true" />
-      {phase === "result" && <div className={`result-burst ${won ? "win" : "lose"}`} role="status" aria-live="assertive">
-        <span>{won ? "WIN" : "LOSE"}</span><small>{landed ? sideLabel(landed) : ""}</small>
+      <div className="portrait-cover portrait-banner-left"><FriendSprite sprites={sprites} /></div>
+      <div className="portrait-cover portrait-banner-right"><FriendSprite sprites={sprites} /></div>
+      <div className="portrait-cover portrait-cabinet-left"><FriendSprite sprites={sprites} /></div>
+      <div className="portrait-cover portrait-cabinet-right"><FriendSprite sprites={sprites} /></div>
+
+      <div className="central-friend-cover" aria-hidden="true" />
+      <FriendSprite sprites={sprites} tossing={phase === "working" || phase === "flipping"} className="wallet-friend-main" />
+      <div className="central-coin-cover" aria-hidden="true" />
+      <ConceptCoin phase={phase} landed={landed} />
+
+      <button type="button" className="hotspot choice-hotspot tails-hotspot" aria-label="SẤP" aria-pressed={choice === "tails"} disabled={unavailable || phase === "result"} onClick={() => { setChoice("tails"); setMessage("Đã chọn SẤP. Sẵn sàng tung xu."); }} />
+      <button type="button" className="hotspot choice-hotspot heads-hotspot" aria-label="NGỬA" aria-pressed={choice === "heads"} disabled={unavailable || phase === "result"} onClick={() => { setChoice("heads"); setMessage("Đã chọn NGỬA. Sẵn sàng tung xu."); }} />
+      <button type="button" className="hotspot action-hotspot" disabled={phase === "result" ? unavailable : flipDisabled} onClick={action} aria-label={actionLabel}>
+        {(phase === "result" || pending || busy) && <span>{actionLabel}</span>}
+      </button>
+
+      {phase === "result" && <div className={`result-burst ${won ? "win" : "lose"}`} role="status" aria-live="assertive"><strong>{won ? "WIN" : "LOSE"}</strong><span>{landed ? sideLabel(landed) : ""}</span></div>}
+      {(error || phase === "result") && <p className="status-toast" role={error ? "alert" : "status"}>{error || message}</p>}
+      <p className="sr-only" aria-live="polite">{error || message}</p>
+
+      {rulesOpen && <div className="rules-shade">
+        <section className="rules-window" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+          <header><span>RARE FLIP</span><button type="button" aria-label="Đóng RULES" onClick={() => setRulesOpen(false)}>×</button></header>
+          <h2 id="rules-title">RULES</h2>
+          <dl>
+            <div><dt>CHỌN</dt><dd>SẤP hoặc NGỬA</dd></div>
+            <div><dt>MỖI LƯỢT</dt><dd>{money(definition.price)}</dd></div>
+            <div><dt>THẮNG</dt><dd>{money(GROSS)} gộp</dd></div>
+            <div><dt>PHÍ</dt><dd>8% · {money(FEE)}</dd></div>
+            <div className="rules-net"><dt>NHẬN RÒNG</dt><dd>{money(NET)}</dd></div>
+            <div><dt>THUA</dt><dd>0 RF</dd></div>
+          </dl>
+          <p>50% WIN · 50% LOSE · RF và kết quả trong bản demo được mô phỏng.</p>
+          <label><input type="checkbox" checked={reducedMotion} onChange={event => setReducedMotion(event.target.checked)} /> GIẢM CHUYỂN ĐỘNG</label>
+          <button type="button" className="rules-close" onClick={() => setRulesOpen(false)}>ĐÃ HIỂU</button>
+        </section>
       </div>}
-      <div className="pixel-sparkles" aria-hidden="true"><i /><i /><i /><i /></div>
     </section>
-
-    <section className="control-deck">
-      <div className="choice-group" aria-label="Chọn mặt đồng xu">
-        <button type="button" className="choice-card" aria-pressed={choice === "tails"} disabled={paused || busy || phase !== "idle"} onClick={() => { setChoice("tails"); setMessage("Đã chọn SẤP. Sẵn sàng tung xu."); }}>
-          <span className="mini-coin tails">◆</span><strong>SẤP</strong><small>Mặt biểu tượng</small>
-        </button>
-        <button type="button" className="choice-card" aria-pressed={choice === "heads"} disabled={paused || busy || phase !== "idle"} onClick={() => { setChoice("heads"); setMessage("Đã chọn NGỬA. Sẵn sàng tung xu."); }}>
-          <span className="mini-coin heads">RF</span><strong>NGỬA</strong><small>Mặt chữ RF</small>
-        </button>
-      </div>
-      <div className="action-column">
-        {phase === "result" ? <button type="button" className="flip-button" disabled={paused || busy} onClick={nextRound}>LƯỢT MỚI</button> :
-          <button type="button" className="flip-button" disabled={actionDisabled} onClick={() => void flip()}>{pending ? "TIẾP TỤC LƯỢT TUNG" : busy ? "ĐANG XỬ LÝ..." : "TUNG XU · 2.000 RF"}</button>}
-        {unclaimed > 0n && <button type="button" className="claim-button" disabled={paused || busy} onClick={() => void claim()}>NHẬN {money(unclaimed * NET)}</button>}
-        <p className="game-feedback" role={error ? "alert" : "status"}>{error || message}</p>
-      </div>
-      <div className="odds-panel">
-        <div><span>TỶ LỆ</span><strong>50 / 50</strong></div>
-        <div><span>CƯỢC</span><strong>2.000 RF</strong></div>
-        <div><span>THẮNG GỘP</span><strong>4.000 RF</strong></div>
-        <div><span>PHÍ</span><strong>8% · 320 RF</strong></div>
-        <div className="net"><span>NHẬN RÒNG</span><strong>3.680 RF</strong></div>
-      </div>
-    </section>
-    <footer><span>DEMO · RF VÀ KẾT QUẢ ĐƯỢC MÔ PHỎNG</span><label><input type="checkbox" checked={reducedMotion} onChange={event => setReducedMotion(event.target.checked)} /> Giảm chuyển động</label></footer>
   </main>;
 }

@@ -26,7 +26,10 @@ await testGame(directory, {
     await game.getByRole("button", { name: /NGỬA/ }).click();
     await game.getByRole("button", { name: "TUNG XU · 2.000 RF", exact: true }).waitFor();
     assert.equal(await game.getByRole("button", { name: "TUNG XU · 2.000 RF", exact: true }).isDisabled(), true, "SDK fixture mặc định 20 RF không đủ cược; luồng kinh tế được kiểm tra bằng ledger 20.000 RF ở trên");
-    assert.match(await game.locator(".odds-panel").innerText(), /8% · 320 RF/);
+    await game.getByRole("button", { name: "RULES", exact: true }).click();
+    await game.getByRole("dialog", { name: "RULES", exact: true }).waitFor();
+    assert.match(await game.getByRole("dialog", { name: "RULES", exact: true }).innerText(), /8% · 320 RF/);
+    await game.getByRole("button", { name: "Đóng RULES", exact: true }).click();
   },
 });
 
