@@ -3,4 +3,5 @@ dist/
 .friendsdk/
 playwright-report/
 test-results/
+outputs/
 *.log
