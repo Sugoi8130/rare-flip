@@ -6,3 +6,8 @@ test-results/
 outputs/
 concepts/
 *.log
+.env
+.env.*
+!.env.example
+*.pem
+*.key

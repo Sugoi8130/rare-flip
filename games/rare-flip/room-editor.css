@@ -1,0 +1,24 @@
+.room-layout-editor { position:absolute; inset:0; z-index:8; pointer-events:none; }
+.placement-spot { position:absolute; transform:translate(-50%,-50%); min-width:36px; min-height:36px; width:4.8%; aspect-ratio:1; pointer-events:auto; touch-action:manipulation; border:2px solid #ffe2a0; background:#422c4ee8; color:#fff3c2; box-shadow:inset 0 0 0 2px #a16b4e,3px 3px #10081d; padding:0; font-size:clamp(12px,2vw,24px); }
+.placement-spot[aria-pressed=true] { transform:translate(-50%,-100%); background:transparent; color:#30192a; border:2px dashed #fff5d0; box-shadow:0 0 0 2px #d891ff60; }
+.placement-spot[aria-pressed=true] > span { position:absolute; right:-8px; bottom:-8px; background:#f4cc75; border:1px solid #fff5d0; min-width:18px; font-size:12px; line-height:18px; }
+.placement-spot:focus-visible { outline:2px solid #a3fff0; outline-offset:3px; }
+.placement-spot:disabled { background:#241c2bd9; color:#aa9eb0; border-color:#817085; box-shadow:none; opacity:.8; }
+.placement-spot small { position:absolute; bottom:100%; left:50%; transform:translateX(-50%); white-space:nowrap; padding:2px 4px; background:#1e122eeF; font-size:clamp(6px,.8vw,10px); color:#fbe6bf; margin-bottom:4px; }
+@media(max-width:520px) { .placement-spot { min-width:30px; min-height:30px; border-width:1px; }.placement-spot small { margin-bottom:2px; padding:1px 2px; font-size:6px; }.room-placement .room-editor-title small { font-size:6px; } }
+.room-editor-title { position:absolute; top:12%; left:2%; padding:8px 12px; background:#21152ee8; border:2px solid #e0b565; box-shadow:inset 0 0 0 2px #624255,3px 3px #090412; color:#ffe4ac; }
+.room-editor-title strong { display:block; font-size:clamp(9px,1.5vw,18px); }
+.room-editor-title small { display:block; color:#cbb5d7; font-size:clamp(6px,.9vw,11px); margin-top:4px; }
+.room-drag-surface { position:absolute; inset:0; }
+.decor-drag-handle { position:absolute; transform:translate(-50%,-100%); min-width:32px; min-height:32px; padding:0; border:2px dashed #ffe398; border-radius:0; background:#ffe39810; box-shadow:0 0 0 1px #291834; color:#ffedb9; cursor:grab; touch-action:none; user-select:none; pointer-events:auto; }
+.decor-drag-handle span { position:absolute; top:-10px; right:-9px; width:18px; height:18px; background:#392340; border:1px solid #ffe398; font-size:13px; line-height:16px; }
+.decor-drag-handle[data-dragging=true] { border-style:solid; cursor:grabbing; background:#ffe39820; }
+.decor-drag-handle[data-invalid=true] { border-color:#ff747d; background:#f5496730; }
+.decor-drag-handle[data-invalid=true] span { border-color:#ff747d; color:#ff747d; }
+.room-editor-toolbar { position:absolute; bottom:3%; left:4.7%; right:4.7%; min-height:15%; padding:1.5% 2%; display:flex; align-items:center; gap:4%; justify-content:space-between; background:#1c122beF; border:2px solid #ae7951; box-shadow:inset 0 0 0 3px #3c2945,4px 4px #09030f; pointer-events:auto; }
+.room-editor-toolbar p { font-size:clamp(7px,1.1vw,13px); line-height:1.4; color:#dcc9e5; max-width:55%; margin:0; }
+.room-editor-toolbar > div { display:flex; gap:10px; }
+.room-editor-toolbar button { border:2px solid #a477b3; background:#44274f; color:#ffe4cc; font-size:clamp(8px,1.3vw,15px); font-weight:bold; padding:.7em; box-shadow:inset 0 2px #65426e,0 3px #090412; }
+.room-editor-toolbar .save-layout { border-color:#ffdf94; color:#321c28; background:#e6b65a; box-shadow:inset 0 2px #ffe9a8,0 3px #89512f; }
+.rare-flip[data-editing=true] .room-controls,.rare-flip[data-editing=true] .control-row,.rare-flip[data-editing=true] .bet-panel,.rare-flip[data-editing=true] .feedback { visibility:hidden; pointer-events:none; }
+@media(max-width:520px) { .decor-drag-handle { min-width:40px; min-height:40px; border-width:1px; }.decor-drag-handle span { width:14px; height:14px; font-size:10px; line-height:12px; }.room-editor-title { padding:3px 5px; border-width:1px; }.room-editor-toolbar > div { gap:4px; }.room-editor-toolbar button { padding:.55em .35em; border-width:1px; }.room-editor-toolbar p { max-width:50%; }.room-editor-toolbar { padding:2%; } }
