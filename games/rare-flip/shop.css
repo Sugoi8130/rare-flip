@@ -66,6 +66,22 @@
 .stage-aquarium { width:22.5%; left:13.25%; right:auto; bottom:5%; }
 .stage-cat { width:20.25%; left:75.625%; right:auto; bottom:8%; }
 .stage-blossom { width:25.5%; left:53.75%; right:auto; bottom:3%; }
+.stage-trophy { width:22%; left:35%; right:auto; bottom:4%; }
+.stage-statue { width:19%; left:72%; right:auto; bottom:32%; }
+.stage-radio { width:27%; left:10%; right:auto; bottom:32%; }
+.stage-pet { width:22%; left:18%; right:auto; bottom:12%; animation:shop-pet-bob 1.6s steps(4,end) infinite; }
+@keyframes shop-pet-bob { 50% { transform:translateY(-3px); } }
+.demo-pet-credit { margin:3px 0; border:1px solid #ac89b5; background:#32203e; color:#d4bfe1; padding:3px 8px; font-size:.9em; }
+.shop-preview[data-category=PET] p,.shop-preview[data-category=PET] .preview-name { flex-shrink:0; }
+.shop-preview[data-category=PET] .preview-stage { min-height:24px; }
+.shop-catalog[data-category=ROOM],.shop-catalog[data-category=PET] { grid-template-rows:repeat(2,minmax(0,1fr)); height:100%; align-content:stretch; gap:3%; overflow:hidden; }
+.shop-catalog[data-category=PET] { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.shop-catalog[data-category=ROOM] .shop-item,.shop-catalog[data-category=PET] .shop-item { display:flex; flex-direction:column; padding:4%; min-height:0; overflow:hidden; }
+.shop-catalog[data-category=ROOM] .item-pedestal,.shop-catalog[data-category=PET] .item-pedestal { height:58%; flex:0 1 58%; min-height:0; aspect-ratio:auto; }
+.shop-catalog[data-category=ROOM] .item-sprite,.shop-catalog[data-category=PET] .item-sprite { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+.shop-catalog[data-category=ROOM] .shop-item strong,.shop-catalog[data-category=PET] .shop-item strong { font-size:.76em; margin:3% 2% 2%; padding:4% 0 0; min-height:2.3em; }
+.shop-catalog[data-category=ROOM] .shop-item > span,.shop-catalog[data-category=PET] .shop-item > span { font-size:.8em; }
+@media(prefers-reduced-motion:reduce) { .stage-pet { animation:none; } }
 .room-equip-actions { display:grid; grid-template-columns:1fr 1fr; gap:5%; margin-top:5%; flex-shrink:0; }
 .room-equip-actions button { padding:.5em .1em; border:1px solid #b58c65; background:#3b274e; color:#ffe4b4; font-size:.67em; font-weight:bold; box-shadow:inset 0 2px #624362,0 2px #0d0818; }
 .room-equip-actions button:disabled { opacity:.4; cursor:default; }
@@ -92,6 +108,11 @@
 .shop-catalog[data-category=COSTUME] .shop-item > span { font-size:.8em; }
 .sprite-effect { animation:shop-sprite-glow 1.8s steps(5,end) infinite; }
 .shop-preview > small { margin-bottom:2%; }
+.live-room-preview { display:block; width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
+.live-scene-stage { background:#090611; }
+.test-win-effect { flex-shrink:0; font-size:.65em; padding:.3em; border:1px solid #ab7d9f; background:#392442; color:#f5d6a2; margin-top:3px; }
+.shop-preview > p,.shop-preview > .preview-name { flex-shrink:0; }
+.shop-preview .live-scene-stage { min-height:24px; }
 .preview-stage { flex:0 1 44%; height:44%; min-height:82px; max-height:44%; }
 .shop-preview p { min-height:0; line-height:1.3; margin:3% 0; }
 .preview-name { margin-top:3%; }

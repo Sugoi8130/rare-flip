@@ -12,6 +12,7 @@ async function openGame() {
   await installFixture(page, origin, { artworkCall:await createArtworkFixture() });
   await page.goto(origin); await page.getByRole("button", { name:/^Connect (wallet|Browser wallet)$/ }).click();
   await page.getByRole("button", { name:/^Friend #7730\b/ }).click();
+  await page.frameLocator("iframe").getByRole("button",{ name:"ENTER ROOM →",exact:true }).click();
   const game = page.frameLocator("iframe"); await game.getByRole("button", { name:"SHOP",exact:true }).waitFor();
   return { page,game };
 }

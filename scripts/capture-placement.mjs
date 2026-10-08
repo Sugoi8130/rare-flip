@@ -11,6 +11,7 @@ try {
   await page.goto("http://127.0.0.1:4173");
   await page.getByRole("button", { name:/^Connect (wallet|Browser wallet)$/ }).click();
   await page.getByRole("button", { name:/^Friend #7730\b/ }).click();
+  await page.frameLocator("iframe").getByRole("button",{ name:"ENTER ROOM →",exact:true }).click();
   const game = page.frameLocator("iframe"), scene = game.locator(".scene");
   const picker = game.getByRole("dialog", { name:"Choose decoration position" });
   await game.getByRole("button", { name:"SHOP",exact:true }).click();

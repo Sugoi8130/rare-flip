@@ -18,6 +18,7 @@ try {
   await page.goto("http://127.0.0.1:4173");
   await page.getByRole("button",{ name:/^Connect (wallet|Browser wallet)$/ }).click();
   await page.getByRole("button",{ name:/^Friend #7730\b/ }).click();
+  await page.frameLocator("iframe").getByRole("button",{ name:"ENTER ROOM →",exact:true }).click();
   const game=page.frameLocator("iframe"),bubble=game.locator(".friend-thought");
   await game.getByRole("button",{ name:"Background music",exact:true }).waitFor();
   const audioFrame=page.frames().find(frame=>frame.url().includes("game.html"));

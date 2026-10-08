@@ -149,6 +149,14 @@ input:focus-visible {
   fill: #12061e;
 }
 
+.balance.combined-balance { box-sizing:border-box; width:160px; height:50px; min-width:160px; padding:5px 10px; gap:8px; }
+.balance-lines { display:flex; flex-direction:column; align-items:flex-start; gap:3px; min-width:0; font-size:12px; line-height:14px; }
+.balance-lines .flip-balance { color:#dac3ff; font-size:10px; line-height:12px; }
+.flip-rules { margin:12px 18px; padding:10px; border:2px solid #ab719b; background:#ead5e8; }
+.flip-rules h3 { font-size:clamp(10px,1.5vw,15px); margin:0 0 7px; color:#492052; }
+.rules-window .flip-rules p { margin:6px 0; padding:0; font-size:clamp(9px,1.3vw,13px); line-height:1.5; }
+@media(max-width:520px) { .balance.combined-balance { width:95px; min-width:95px; height:38px; min-height:38px; padding:3px 5px; }.balance-lines { gap:1px; font-size:9px; line-height:11px; }.balance-lines .flip-balance { font-size:8px; line-height:10px; }.flip-rules { margin:8px 12px; padding:7px; } }
+
 .scene {
   position: relative;
   height: 68.89%;

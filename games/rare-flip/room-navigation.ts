@@ -13,9 +13,20 @@ const furniture = [
   { left:120, right:207, top:357, bottom:410 }, // foreground columns
   { left:753, right:840, top:357, bottom:410 },
 ];
-export function canWalkRoom(x: number, y: number) {
+export function canWalkRoom(x: number, y: number,theme:string="classic") {
   const bounds = ROOM_WALK_BOUNDS;
   if (!Number.isFinite(x) || !Number.isFinite(y) || x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) return false;
+  if(theme !== "classic") {
+    if(x>347 && x<614 && y>198 && y<315) return false;
+    if(theme === "galaxyroom") return ((x-480)/445)**2+((y-276)/120)**2<.98;
+    if(y<208 || y>391 || x<95 || x>865) return false;
+    return ![
+      {left:82,right:188,top:192,bottom:239}, // cellar entrance stairs
+      {left:742,right:900,top:192,bottom:235}, // raised lounge
+      {left:82,right:184,top:352,bottom:398}, // front wall
+      {left:782,right:900,top:352,bottom:398},
+    ].some(prop=>x>prop.left && x<prop.right && y>prop.top && y<prop.bottom);
+  }
   if (x > 347 && x < 614 && y > 198 && y < 331) return false;
   if ([319,374,591,644].some(post => Math.hypot(x - post, y - (post === 319 || post === 644 ? 251 : 226)) < 17)) return false;
   return !furniture.some(prop => x > prop.left && x < prop.right && y > prop.top && y < prop.bottom);

@@ -2,6 +2,12 @@ import { useEffect, useRef } from "react";
 import roomUrl from "./assets/arcade-room.png";
 import approvedUrl from "./assets/approved-artwork.png";
 import { pixelText } from "./pixel-text";
+import { roomAsset, type RoomId } from "./rooms";
+const themes=new Map<RoomId,HTMLImageElement>();
+function roomImage(id:RoomId) {
+  if(id === "classic") return artworkImages().room;
+  let image=themes.get(id); if(!image) { image=new Image();image.src=roomAsset(id);themes.set(id,image); } return image;
+}
 
 let room: HTMLImageElement | null = null, approved: HTMLImageElement | null = null;
 export function artworkImages() {
@@ -9,18 +15,12 @@ export function artworkImages() {
   return { room, approved: approved! };
 }
 
-export function renderRoom(ctx: CanvasRenderingContext2D) {
-  const images = artworkImages();
+export function renderRoom(ctx: CanvasRenderingContext2D, theme:RoomId="classic") {
+  const room=roomImage(theme);
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.scale(ctx.canvas.width / 960, ctx.canvas.height / 540); ctx.imageSmoothingEnabled = false;
   ctx.fillStyle = "#10051f"; ctx.fillRect(0, 0, 960, 540);
-  if (images.room.complete && images.room.naturalWidth) ctx.drawImage(images.room, 0, 0, images.room.naturalWidth, images.room.naturalHeight, 0, 0, 960, 540);
-}
-
-// A foreground slice from the clean room provides real depth occlusion.
-export function renderTableFront(ctx: CanvasRenderingContext2D) {
-  const { room } = artworkImages();
-  if (room.complete && room.naturalWidth) ctx.drawImage(room, 636, 479, 407, 98, 636 / 1672 * 960, 479 / 941 * 540, 407 / 1672 * 960, 98 / 941 * 540);
+  if (room.complete && room.naturalWidth) ctx.drawImage(room, 0, 0, room.naturalWidth, room.naturalHeight, 0, 0, 960, 540);
 }
 
 export function renderArtCoin(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, heads: boolean, squash: number) {

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { decorLayout, validDecorPosition, type DecorPosition, type RoomPositions } from "./room-layout";
 import "./room-editor.css";
+import { EXTRA_ART } from "./extra-art";
 
-export function RoomEditor({ items, positions, setPositions, paused, onSave, onCancel }: {
+export function RoomEditor({ items, positions, setPositions, paused, onSave, onCancel,roomTheme }: {
   items: string[]; positions: RoomPositions; setPositions: Dispatch<SetStateAction<RoomPositions>>;
-  paused: boolean; onSave: () => void; onCancel: () => void;
+  roomTheme:string;paused: boolean; onSave: () => void; onCancel: () => void;
 }) {
   const surface = useRef<HTMLDivElement>(null);
   const drag = useRef<{ id: string; pointerId: number; start: DecorPosition; origin: DecorPosition } | null>(null);
@@ -18,7 +19,7 @@ export function RoomEditor({ items, positions, setPositions, paused, onSave, onC
     const canvas = surface.current?.closest(".game-shell")?.querySelector<HTMLCanvasElement>(".scene canvas");
     return { x: Number(canvas?.dataset.playerX ?? 480), y: Number(canvas?.dataset.playerY ?? 369) };
   }
-  function valid(id: string, point: DecorPosition) { return validDecorPosition(id, point, items, positions, playerPoint()); }
+  function valid(id: string, point: DecorPosition) { return validDecorPosition(id, point, items, positions, playerPoint(),roomTheme); }
   function stopDrag(cancel: boolean) {
     const current = drag.current; if (!current) return;
     const point = decorLayout(current.id, positions)!;
@@ -38,7 +39,8 @@ export function RoomEditor({ items, positions, setPositions, paused, onSave, onC
     <div className="room-editor-title"><strong>EDIT ROOM</strong><small>Drag an item · Arrow keys for fine adjustment</small></div>
     <div className="room-drag-surface" ref={surface}>{items.map(id => {
       const prop = decorLayout(id, positions); if (!prop) return null;
-      const height = prop.width * (id === "aquarium" ? 470 / 377 : id === "cat" ? 405 / 400 : 440 / 392);
+      const bounds=EXTRA_ART[id]?.bounds;
+      const height = prop.width * (bounds ? bounds[3]/bounds[2] : id === "aquarium" ? 470 / 377 : id === "cat" ? 405 / 400 : 440 / 392);
       return <button key={id} type="button" className="decor-drag-handle" aria-label={`Move ${prop.name}`} disabled={paused}
         data-dragging={dragging === id} data-invalid={dragging === id && invalid}
         style={{ left: `${prop.x / 960 * 100}%`, top: `${prop.y / 540 * 100}%`, width: `${prop.width / 960 * 100}%`, height: `${height / 540 * 100}%` }}

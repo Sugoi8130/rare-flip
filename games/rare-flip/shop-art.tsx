@@ -4,6 +4,7 @@ import skateboardUrl from "./assets/mint-skateboard.png";
 import classicUrl from "./assets/shop-items-v2.png";
 import { decorLayout, type RoomPositions } from "./room-layout";
 import { drawRoyalAura } from "./aura-art";
+import { EXTRA_ART, extraImage, drawExtraArt } from "./extra-art";
 
 const ids = ["aquarium", "cat", "blossom", "beanie", "scarf", "wings", "hearts", "orbit", "confetti"];
 let atlas: HTMLImageElement | null = null;
@@ -11,6 +12,10 @@ let skateboard: HTMLImageElement | null = null;
 let classic: HTMLImageElement | null = null;
 export function drawRoomDecoration(ctx: CanvasRenderingContext2D, id: string, positions: RoomPositions) {
   const layout = decorLayout(id, positions); if (!layout) return;
+  if (EXTRA_ART[id]) {
+    ctx.fillStyle="#1d132b"; ctx.fillRect(Math.round(layout.x-layout.width*.4),layout.y-3,Math.round(layout.width*.8),4);
+    drawExtraArt(ctx,id,layout.x,layout.y,layout.width); return;
+  }
   if (!atlas) { atlas = new Image(); atlas.src = atlasUrl; }
   if (!atlas.complete || !atlas.naturalWidth) return;
   const index = ids.indexOf(id);
@@ -25,6 +30,18 @@ export function drawRoomDecoration(ctx: CanvasRenderingContext2D, id: string, po
 export function ItemArt({ id, className = "" }: { id: string; className?: string }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
+    if (EXTRA_ART[id]) {
+      const image=extraImage(id)!;
+      const paintExtra=() => {
+        const ctx=canvas.current?.getContext("2d"); if (!ctx || !image.naturalWidth) return;
+        const [, ,w,h]=EXTRA_ART[id].bounds;
+        const width=Math.round(Math.min(220,220*w/h));
+        ctx.clearRect(0,0,256,256); drawExtraArt(ctx,id,128,238,width);
+        canvas.current!.dataset.loaded="true";
+      };
+      if (image.complete) paintExtra(); else image.addEventListener("load",paintExtra);
+      return () => image.removeEventListener("load",paintExtra);
+    }
     if (id === "aura") {
       const ctx = canvas.current?.getContext("2d"); if (!ctx) return;
       ctx.clearRect(0, 0, 256, 256);

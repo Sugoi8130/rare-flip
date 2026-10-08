@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { decorLayout, ROOM_PLACEMENT_SPOTS, validDecorPosition, type DecorPosition, type RoomPositions } from "./room-layout";
+import { decorLayout, validDecorPosition, type DecorPosition, type RoomPositions } from "./room-layout";
 import "./room-editor.css";
+import { roomSpots } from "./room-layout";
 
-export function RoomPlacement({ id, items, positions, selected, onSelect, onPlace, onCancel, paused }: {
+export function RoomPlacement({ id, items, positions, selected, onSelect, onPlace, onCancel, paused,roomTheme }: {
   id: string; items: string[]; positions: RoomPositions; selected: DecorPosition | null;
-  onSelect: (point: DecorPosition) => void; onPlace: () => void; onCancel: () => void; paused: boolean;
+  onSelect: (point: DecorPosition) => void; onPlace: () => void; onCancel: () => void; paused: boolean;roomTheme:string;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const [player, setPlayer] = useState<DecorPosition>({ x:480, y:369 });
@@ -14,12 +15,13 @@ export function RoomPlacement({ id, items, positions, selected, onSelect, onPlac
     root.current?.querySelector<HTMLButtonElement>(".placement-spot:not(:disabled)")?.focus();
   }, [id]);
   const prop = decorLayout(id, positions)!;
-  const available = (point: DecorPosition) => validDecorPosition(id, point, items, positions, player);
-  const chosen = ROOM_PLACEMENT_SPOTS.find(spot => selected?.x === spot.x && selected?.y === spot.y);
+  const spots=roomSpots(roomTheme);
+  const available = (point: DecorPosition) => validDecorPosition(id, point, items, positions, player,roomTheme);
+  const chosen = spots.find(spot => selected?.x === spot.x && selected?.y === spot.y);
   return <div ref={root} className="room-layout-editor room-placement" role="dialog" aria-modal="true" aria-label="Choose decoration position"
     onKeyDown={event => { if (event.key === "Escape" && !paused) { event.preventDefault(); onCancel(); } }}>
     <div className="room-editor-title"><strong>CHOOSE A SPOT</strong><small>{prop.name} · 6 preset locations</small></div>
-    {ROOM_PLACEMENT_SPOTS.map((spot, index) => {
+    {spots.map((spot, index) => {
       const free = available(spot);
       return <button key={spot.id} type="button" className="placement-spot" aria-label={`Place at ${spot.name}`} aria-pressed={chosen?.id === spot.id}
         disabled={paused || !free} title={free ? spot.name : `${spot.name} · Occupied`}

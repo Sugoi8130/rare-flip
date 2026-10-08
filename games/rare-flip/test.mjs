@@ -41,6 +41,7 @@ await testGame(directory, {
   height: 800,
   screenshot: new URL("../../outputs/rare-flip-desktop.png", import.meta.url).pathname.replace(/^\/(.:)/, "$1"),
   check: async ({ page, game }) => {
+    await game.getByRole("button",{ name:"ENTER ROOM →",exact:true }).click();
     await game.getByRole("main", { name: "Rare Flip" }).waitFor();
     const canvas = game.locator(".scene canvas");
     await canvas.click({ position: { x: 480, y: 320 } });
@@ -81,6 +82,7 @@ await testGame(directory, {
   height: 844,
   screenshot: new URL("../../outputs/rare-flip-mobile.png", import.meta.url).pathname.replace(/^\/(.:)/, "$1"),
   check: async ({ page, game }) => {
+    await game.getByRole("button",{ name:"ENTER ROOM →",exact:true }).click();
     await game.getByRole("main", { name: "Rare Flip" }).waitFor();
     const box = await game.locator(".rare-flip").boundingBox();
     assert(box && box.width <= 390 && box.width >= 320, "Game phải vừa màn hình điện thoại");
