@@ -15,6 +15,8 @@ For a fresh computer, see [CONTINUE.md](CONTINUE.md) and run `scripts/setup-new-
 
 ## Run
 
+Public no-wallet gameplay tester: `/demo.html` on the published site. This separate entry uses explicitly labelled recorded sample artwork, the same game UI and simulated variable-wager ledger, starts with 200,000 sample RF, and offers RESET DEMO. It neither connects to a wallet nor reads RPC; its CSP blocks all network connections. The normal `/` SDK wallet/owned-Friend gate is unchanged. Build the full site with `node scripts/build-site.mjs build`. For automated local verification, run `node scripts/build-demo.mjs .friendsdk/demo` then `node scripts/test-no-wallet-demo.mjs` (this starts its own temporary static server; the SDK server does not serve non-SDK entrypoints). All demo balances/shop data reset with the page or RESET DEMO.
+
 ```powershell
 pnpm install
 pnpm check

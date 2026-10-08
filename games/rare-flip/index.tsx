@@ -119,7 +119,7 @@ function RabbitMark() {
   return <svg viewBox="0 0 6 6" shapeRendering="crispEdges" aria-hidden="true"><path d="M0 0h2v2h2V0h2v6H0z" /><path className="mark-eyes" d="M1 3h1v1H1z M4 3h1v1H4z" /></svg>;
 }
 
-export default function RareFlip({ friendId, client, paused }: GameComponentProps) {
+export default function RareFlip({ friendId, client, paused, demoSprites }: GameComponentProps & { demoSprites?: GenerationSprites }) {
   const [roomTheme,setRoomTheme]=useState<RoomId | null>(null);
   const [shopOpen, setShopOpen] = useState(false);
   const [shopInventory, setShopInventory] = useState<ShopInventory>(INITIAL_SHOP_INVENTORY);
@@ -154,9 +154,9 @@ export default function RareFlip({ friendId, client, paused }: GameComponentProp
   const lock = useRef(false), alive = useRef(true), timer = useRef<number | null>(null), definition = client.definition;
   useEffect(() => {
     alive.current = true; const preference = window.matchMedia("(prefers-reduced-motion: reduce)"), update = () => setReducedMotion(preference.matches); update(); preference.addEventListener("change", update);
-    void Promise.all([client.read(), createFriendReader().read(friendId)]).then(([state, art]) => { if (!alive.current) return; if (state.friendId !== friendId) throw new Error("The game session does not match your selected Rare Friend."); setSnapshot(state); setSprites(art); if (state.plays.some(play => play.outcomeId === null)) setMessage("A flip is pending. Resume it without another bet."); }).catch(cause => { if (alive.current) setError(cause instanceof Error ? cause.message : "Unable to load the game."); });
+    void Promise.all([client.read(), demoSprites ? Promise.resolve(demoSprites) : createFriendReader().read(friendId)]).then(([state, art]) => { if (!alive.current) return; if (state.friendId !== friendId) throw new Error("The game session does not match your selected Rare Friend."); setSnapshot(state); setSprites(art); if (state.plays.some(play => play.outcomeId === null)) setMessage("A flip is pending. Resume it without another bet."); }).catch(cause => { if (alive.current) setError(cause instanceof Error ? cause.message : "Unable to load the game."); });
     return () => { alive.current = false; preference.removeEventListener("change", update); if (timer.current !== null) window.clearTimeout(timer.current); };
-  }, [client, friendId]);
+  }, [client, friendId, demoSprites]);
   async function refresh() { const state = await client.read(); if (alive.current) setSnapshot(state); return state; }
   async function flip() {
     if (!snapshot || !choice || !betValid || paused || rulesOpen || lock.current) return; lock.current = true; setBusy(true); setError(""); setResult(null); setLanded(null); setPhase("working");
