@@ -2,6 +2,13 @@
 
 Pixel coin-flip game built as a standalone FriendSDK v0.1.4 project.
 
+## Play on GitHub Pages
+
+- [No-wallet gameplay demo](https://sugoi8130.github.io/rare-flip/demo.html): sample Friend, 200,000 simulated RF, RESET DEMO, no wallet/RPC access.
+- [FriendSDK wallet preview](https://sugoi8130.github.io/rare-flip/): wallet and owned-Friend gate preserved; all wagers remain simulated.
+
+`.github/workflows/pages.yml` rebuilds and publishes both entrypoints on pushes to `master`, or manual dispatch. All asset and script paths are relative, compatible with the `/rare-flip/` project path. The earlier Sites URLs remain available; Pages is the primary tester link.
+
 For a fresh computer, see [CONTINUE.md](CONTINUE.md) and run `scripts/setup-new-pc.ps1`. Required artwork and sound source are included; keep this project separate from the other games.
 
 ## Exact demo economy
