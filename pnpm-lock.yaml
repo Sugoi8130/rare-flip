@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@rarefriends/friendsdk':
-        specifier: https://github.com/spokesz/friendsdk/releases/download/v0.1.4/rarefriends-friendsdk-0.1.4.tgz
-        version: https://github.com/spokesz/friendsdk/releases/download/v0.1.4/rarefriends-friendsdk-0.1.4.tgz(playwright@1.63.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: github:rarefriends/friendsdk#c19058711f3c207c67cd30b8136de89978f08ddd
+        version: https://codeload.github.com/rarefriends/friendsdk/tar.gz/c19058711f3c207c67cd30b8136de89978f08ddd(react@19.3.0)
       react:
         specifier: ^19.2.0
         version: 19.3.0
@@ -191,21 +191,27 @@ packages:
     resolution: {integrity: sha512-k11yZxZg+t+gWvBbIswW0yoJlu8cHOC7dhunwOzoWH/mXGBiYyR4YY6hAEK/3EUs4UpB8la1RfdRpeGsFHkWsA==}
     engines: {node: ^14.21.3 || >=16}
 
+  '@noble/curves@2.4.0':
+    resolution: {integrity: sha512-P4/62zrgfH33CneE3Dn4WhJVA22YUU0eR51wKIan4NVRvwsA0YnPTwWGpNbpuacSujmSFLvyzpyuR30+fbq2Ew==}
+    engines: {node: '>= 20.19.0'}
+
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
 
-  '@rarefriends/friendsdk@https://github.com/spokesz/friendsdk/releases/download/v0.1.4/rarefriends-friendsdk-0.1.4.tgz':
-    resolution: {integrity: sha512-UOGYXJe9deuz3jpNonRH4BTb6fmPm6bhCPitnEDUq+plf69FzUCQICmuTg6+c22o7QE26gVuq5/4Naa4F+ZVQA==, tarball: https://github.com/spokesz/friendsdk/releases/download/v0.1.4/rarefriends-friendsdk-0.1.4.tgz}
-    version: 0.1.4
+  '@noble/hashes@2.4.0':
+    resolution: {integrity: sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==}
+    engines: {node: '>= 20.19.0'}
+
+  '@rarefriends/friendsdk@https://codeload.github.com/rarefriends/friendsdk/tar.gz/c19058711f3c207c67cd30b8136de89978f08ddd':
+    resolution: {gitHosted: true, integrity: sha512-RNYOfikH/KHg9pmRkH9jP0FU5dyAXfoYJy/jqA8PWxHtT+UUPU4dAY3siTHrF10e+RwyMRGZM4EjZ4k3WzfbtA==, tarball: https://codeload.github.com/rarefriends/friendsdk/tar.gz/c19058711f3c207c67cd30b8136de89978f08ddd}
+    version: 1.0.0
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
-      playwright: ^1.63.0
-      react: ^19.0.0
-      react-dom: ^19.0.0
+      react: '>=18'
     peerDependenciesMeta:
-      playwright:
+      react:
         optional: true
 
   '@scure/base@1.2.6':
@@ -227,6 +233,11 @@ packages:
         optional: true
       zod:
         optional: true
+
+  acorn@8.19.0:
+    resolution: {integrity: sha512-oJlA3XiRm7Cyk6qFD2Jn8ak9B7jSy0qy00ADO3+8dpT0LSjFihQYv4C02LFCSYJV3Q37xYwwRy5m+IpIiUzqWw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
 
   esbuild@0.28.2:
     resolution: {integrity: sha512-HKVLS8dvII+xoKW9kmqxbRKrnWEXfJJr/FZhhJmiqIB0e053QNYFqOBouTMO/k5sID4MvCiUCvv8b9M4h32wIA==}
@@ -379,16 +390,23 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.8.0
 
+  '@noble/curves@2.4.0':
+    dependencies:
+      '@noble/hashes': 2.4.0
+
   '@noble/hashes@1.8.0': {}
 
-  '@rarefriends/friendsdk@https://github.com/spokesz/friendsdk/releases/download/v0.1.4/rarefriends-friendsdk-0.1.4.tgz(playwright@1.63.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@noble/hashes@2.4.0': {}
+
+  '@rarefriends/friendsdk@https://codeload.github.com/rarefriends/friendsdk/tar.gz/c19058711f3c207c67cd30b8136de89978f08ddd(react@19.3.0)':
     dependencies:
+      '@noble/curves': 2.4.0
+      '@noble/hashes': 2.4.0
+      acorn: 8.19.0
       esbuild: 0.28.2
-      react: 19.3.0
-      react-dom: 19.3.0(react@19.3.0)
       viem: 2.56.3
     optionalDependencies:
-      playwright: 1.63.0
+      react: 19.3.0
     transitivePeerDependencies:
       - bufferutil
       - typescript
@@ -409,6 +427,8 @@ snapshots:
       '@scure/base': 1.2.6
 
   abitype@1.2.3: {}
+
+  acorn@8.19.0: {}
 
   esbuild@0.28.2:
     optionalDependencies:

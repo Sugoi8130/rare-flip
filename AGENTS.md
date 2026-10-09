@@ -1,7 +1,7 @@
 # Rare Flip
 
 - This is a standalone FriendSDK game. Do not edit sibling projects.
-- Preserve the FriendSDK wallet and owned-Friend gate.
+- SDK 1.0: preserve platform-supplied identity; never add in-game wallet connection or ownership discovery. The separate sample-art no-wallet tester is intentional.
 - Preview balances and outcomes are simulated unless an explicitly authorized deployment is configured.
 - One wager costs 2,000–100,000 RF, in 2,000 RF steps. One roll settles the whole wager.
 - Outcome weights are 5,000 bps WIN and 5,000 bps LOSE.
@@ -12,3 +12,4 @@
 - Pause input and animation while the host sets `paused`.
 - Keep controls usable on touch screens and respect reduced-motion preferences.
 - Do not add live signing, token transfer, approval, or on-chain behavior without explicit user authorization.
+- Use root friendsdk.json and SDK 1.0 connect/art/holdings/transact APIs. Live payments are disabled in sdk-client.ts. SDK payouts are automatic to the Friend wallet; standalone demo claims remain simulated.

@@ -1,7 +1,7 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import "./shop.css";
 import { type RoomId } from "./rooms";
-import type {GenerationSprites} from "@rarefriends/friendsdk/sprites";
+import type {GenerationSprites} from './game-model';
 import {ShopPreview} from "./shop-preview";
 import type {Player} from "./scene-renderer";
 import type {PetPosition} from "./extra-art";

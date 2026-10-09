@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { GameComponentProps } from "@rarefriends/friendsdk/runtime";
-import type { GamePlay, GameSnapshot } from "@rarefriends/friendsdk/game";
-import { maximumPrize } from "@rarefriends/friendsdk/game";
-import { createFriendReader, type GenerationSprites } from "@rarefriends/friendsdk/sprites";
-import { formatGameAmount } from "@rarefriends/friendsdk/ui";
+import {type GameComponentProps,type GamePlay,type GameSnapshot,maximumPrize,type GenerationSprites,formatGameAmount} from './game-model';
 import "./style.css";
 import { ArtButton } from "./artwork";
 import { ResultBanner } from "./results";
@@ -154,7 +150,7 @@ export default function RareFlip({ friendId, client, paused, demoSprites }: Game
   const lock = useRef(false), alive = useRef(true), timer = useRef<number | null>(null), definition = client.definition;
   useEffect(() => {
     alive.current = true; const preference = window.matchMedia("(prefers-reduced-motion: reduce)"), update = () => setReducedMotion(preference.matches); update(); preference.addEventListener("change", update);
-    void Promise.all([client.read(), demoSprites ? Promise.resolve(demoSprites) : createFriendReader().read(friendId)]).then(([state, art]) => { if (!alive.current) return; if (state.friendId !== friendId) throw new Error("The game session does not match your selected Rare Friend."); setSnapshot(state); setSprites(art); if (state.plays.some(play => play.outcomeId === null)) setMessage("A flip is pending. Resume it without another bet."); }).catch(cause => { if (alive.current) setError(cause instanceof Error ? cause.message : "Unable to load the game."); });
+    void Promise.all([client.read(), demoSprites ? Promise.resolve(demoSprites) : Promise.reject(new Error('The host did not supply Friend artwork.'))]).then(([state, art]) => { if (!alive.current) return; if (state.friendId !== friendId) throw new Error("The game session does not match your selected Rare Friend."); setSnapshot(state); setSprites(art); if (state.plays.some(play => play.outcomeId === null)) setMessage("A flip is pending. Resume it without another bet."); }).catch(cause => { if (alive.current) setError(cause instanceof Error ? cause.message : "Unable to load the game."); });
     return () => { alive.current = false; preference.removeEventListener("change", update); if (timer.current !== null) window.clearTimeout(timer.current); };
   }, [client, friendId, demoSprites]);
   async function refresh() { const state = await client.read(); if (alive.current) setSnapshot(state); return state; }
@@ -172,7 +168,7 @@ export default function RareFlip({ friendId, client, paused, demoSprites }: Game
   const unavailable = paused || rulesOpen || shopOpen || editingRoom || Boolean(placingItem) || busy || phase === "flipping" || phase === "working";
   const needed = selectedUnits > snapshot.consumables ? selectedUnits - snapshot.consumables : 0n;
   const variableHost = Boolean((snapshot as GameSnapshot & { wagerQuantities?: Record<string, bigint> }).wagerQuantities);
-  const flipDisabled = unavailable || phase === "result" || !choice || !betValid || (!pending && ((!variableHost && selectedUnits !== 1n) || snapshot.rfBalance < needed * definition.price || snapshot.freeStake + needed * definition.price < needed * maximumPrize(definition)));
+  const flipDisabled = unavailable || phase === "result" || !choice || !betValid || (!pending && ((!variableHost && selectedUnits !== 1n) || snapshot.available?.['flip'+betNumber] === false || snapshot.rfBalance < needed * definition.price || snapshot.freeStake + needed * definition.price < needed * maximumPrize(definition)));
   const actionLabel = phase === "result" ? unclaimed > 0n ? `CLAIM ${money(unclaimed * NET)}` : won ? "NEXT ROUND" : "TRY AGAIN" : pending ? "RESUME FLIP" : busy ? "WORKING..." : `FLIP COIN · ${money(selectedBet)}`;
   const action = phase === "result" ? unclaimed > 0n ? () => void claim() : nextRound : () => void flip();
   const roomPositions = editingRoom ? draftPositions : placingItem && placementSpot ? { ...shopInventory.roomPositions, [placingItem]:placementSpot } : shopInventory.roomPositions;

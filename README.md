@@ -1,56 +1,47 @@
 # Rare Flip
 
-Pixel coin-flip game built as a standalone FriendSDK v0.1.4 project.
+Retro pixel coin-flip game on **FriendSDK 1.0.0**, pinned to `rarefriends/friendsdk@c19058711f3c207c67cd30b8136de89978f08ddd`.
 
-## Play on GitHub Pages
+## Play
 
-- [No-wallet gameplay demo](https://sugoi8130.github.io/rare-flip/demo.html): sample Friend, 200,000 simulated RF, RESET DEMO, no wallet/RPC access.
-- [FriendSDK wallet preview](https://sugoi8130.github.io/rare-flip/): wallet and owned-Friend gate preserved; all wagers remain simulated.
+[No-wallet gameplay demo](https://sugoi8130.github.io/rare-flip/demo.html): sample artwork, 200,000 simulated RF, RESET DEMO, desktop and touch controls. No wallet, RPC or real tokens. Static root redirects here; the 0.1 wallet host is no longer shipped.
 
-`.github/workflows/pages.yml` rebuilds and publishes both entrypoints on pushes to `master`, or manual dispatch. All asset and script paths are relative, compatible with the `/rare-flip/` project path. The earlier Sites URLs remain available; Pages is the primary tester link.
+Platform sessions use `connect()`, `game.friend`, `game.art`, `holdings()` and `transact()`. Only the platform selects/verifies Friends and owns payment confirmations. This version refuses live payments; owner deployment and separate authorization are required to enable them. GitHub Pages cannot supply platform sessions, Nakama or the keeper.
 
-For a fresh computer, see [CONTINUE.md](CONTINUE.md) and run `scripts/setup-new-pc.ps1`. Required artwork and sound source are included; keep this project separate from the other games.
+## Commands
 
-## Exact demo economy
+Node.js 24. On Windows use `scripts/setup-new-pc.ps1`, or:
 
-- Pick **HEADS** or **TAILS**.
-- Each flip costs **2,000–100,000 RF**, in **2,000 RF** steps. One roll settles the entire wager.
-- WIN chance: **50%**. Gross return: **2x the wager**. Fee: **8% of the original wager**, deducted on a win only. Net redeemable return: **1.92x the wager** (100,000 RF pays 192,000 RF).
-- LOSE chance: **50%**. Return: **0 RF**.
-- Expected return: **96% of the wager (96% RTP / 4% edge)**.
-- Local preview starts with **200,000 simulated RF**. The project-owned variable-bet ledger is injected by the preview build script, without editing FriendSDK. This is local preview only; no real RF or transaction is used. SDK live/on-chain variable-bet support is not configured.
-
-## Run
-
-Public no-wallet gameplay tester: `/demo.html` on the published site. This separate entry uses explicitly labelled recorded sample artwork, the same game UI and simulated variable-wager ledger, starts with 200,000 sample RF, and offers RESET DEMO. It neither connects to a wallet nor reads RPC; its CSP blocks all network connections. The normal `/` SDK wallet/owned-Friend gate is unchanged. Build the full site with `node scripts/build-site.mjs build`. For automated local verification, run `node scripts/build-demo.mjs .friendsdk/demo` then `node scripts/test-no-wallet-demo.mjs` (this starts its own temporary static server; the SDK server does not serve non-SDK entrypoints). All demo balances/shop data reset with the page or RESET DEMO.
-
-```powershell
-pnpm install
+```sh
+pnpm install --frozen-lockfile
 pnpm check
 pnpm test
+pnpm build
 pnpm dev
 ```
 
-The FriendSDK host still owns wallet connection, owned-Friend selection, sandboxing and action confirmations. Live/on-chain behavior is intentionally not configured.
+Dev runs the official simulated chain, Nakama emulator, keeper and fixture Friend picker, without wallets or Docker. Default ports 4173/4174; `pnpm dev --port 4180` for integration tests when the defaults are occupied.
 
-Room exploration covers the clear floor on both sides (logical horizontal bounds 82–878). Machines, stools, coin cabinets, plants, foreground columns, the central table, rope posts and equipped decorations remain collision obstacles. Mouse/tap targets and keyboard/dpad movement share the same floor rules. `node scripts/capture-navigation.mjs` verifies widened side-floor access and mobile touch movement.
+`pnpm build` creates `.friendsdk/build/` with client, manifest, contract request and file hashes for platform review, not live deployment. `node scripts/build-site.mjs build` exports the standalone demo to `dist/` and host-only SDK client to `dist/sdk/`. GitHub Pages rebuilds on master pushes. The older Sites snapshot is not automatically updated.
 
-The Friend has short English pixel thought bubbles: idle chatter after 18–30 seconds without movement, thinking after choosing a side, and result dialogue after WIN/LOSE. Rewards of at least 50,000 RF use the big-win set. Every third consecutive loss suggests a rest, with no loss-chasing claims. Bubbles last four seconds and pause with game overlays. Original synthesized chiptune music and button/coin/WIN/LOSE sound cues require an initial game gesture; MUSIC and SFX have independent toggles. Audio suspends during host pause or a hidden page, and is disposed on unmount. No audio download or third-party music is used. `node scripts/capture-thoughts-sound.mjs` verifies these flows using simulated plays and observed Web Audio scheduling.
+## Economy and limitations
 
-## Cosmetic shop prototype
+- Bets 2,000–100,000 RF, steps of 2,000. HEADS/TAILS; one draw per whole wager.
+- WIN 50%, pays 1.92× original bet (2× gross less 8% of original bet). LOSE 50%, pays 0. Expected return 96%.
+- Root friendsdk.json declares 50 distinct draws, quantity 1, two lanes of 25 to fit deployed module limits. Each lane requires its own owner-funded bankroll. No contracts are deployed here.
+- SDK winnings go automatically to the Friend wallet; RF HUD holdings are the paying wallet balance. These wallets can differ. No manual CLAIM is sent in SDK sessions.
+- Pending payments resume by transaction hash, including changed ids after placement. Unseen settled transactions can be resumed after reload; acknowledged results are not repurchased.
+- Earn 1 FLIP per 2,000 RF wagered, both outcomes, once at settlement. Cosmetic inventory, FLIP and layouts remain session-only, starting with 250 sample FLIP; persistent server-backed progress is not implemented.
+- The standalone demo deliberately keeps its simulated local ledger and CLAIM flow; neither sample artwork nor its id claims NFT ownership.
 
-The room HUD stacks RF above FLIP in one fixed-size wallet frame. RULES explains the earning rate: 2,000 RF wagered = 1 FLIP, on both WIN and LOSE, credited once per settled play from the original wager before fees. Claims and winnings grant no extra FLIP. `node scripts/capture-flip-balance.mjs` verifies wallet synchronization and desktop/mobile rules layout. Preview shop credit and purchases remain simulated and session-only; this does not implement persistent or on-chain FLIP accounting.
+## Graphics
 
-LIVE PREVIEW now shares `scene-renderer.ts` with the playable room, using the actual selected Friend sprite, current player/pet pose, equipped slots and saved decoration coordinates. Selected unowned/unequipped items are staged without changing inventory; costume selection replaces only its matching slot. The camera zooms all objects uniformly (never scales items independently). Effects animate with the same scene renderer; TEST WIN EFFECT is cosmetic only, spends nothing and makes no play request. Host pause freezes the preview clock, reduced motion uses the same static frames as the room. `node scripts/capture-live-preview.mjs` compares all 19 items' actual draw dimensions/coordinates against the playable room and checks animation/mobile layout.
+Classic Room, Darkroom and Galaxyroom, solid-black outlined Friend, walking and idle bobbing, animated toss and WIN/LOSE panels. Shared room/shop renderer; six decorations with preset/drag placement, headwear/skateboard/wings/aura, three effects and four following pets. English thoughts, original synthesized sound/music, pause and reduced motion. Assets/prompts in games/rare-flip/assets; recorded sample art in sample-art.ts.
 
-PET artwork v2 keeps the mint slime, peach/cream fox with mint tail tip, violet moon bat and teal/gold star dragon concepts but simplifies silhouettes and details. The shop and room share a cached coarse native sprite (16 pixels wide for slime, 18 for fox/dragon and 20 for bat), drawn nearest-neighbor without smoothing or pixel readback. Playable dimensions, prices, following, bobbing and mirroring are unchanged; original v1 PNGs remain available.
+## Verification
 
-After the SDK wallet/Friend gate, every new game session opens “What room do you want to RARE FLIP?”. Choose CLASSIC ROOM, DARKROOM or GALAXYROOM, then ENTER ROOM. Darkroom is an asymmetric vaulted cellar with entrance stairs, candle alcoves and a raised lounge. Galaxyroom is a circular observatory deck with panorama windows, navigation console and telescope. These are distinct background structures, not recolors. Movement boundaries and decoration placement account for the chosen layout (Galaxyroom front presets move inward). Shop preview uses the selected background. The room/table is drawn before the Friend; collision prevents entering the solid table. No opaque room slice is redrawn over the Friend. Room choice does not affect odds, wagers, fees or shop prices; reload returns to room selection. `node scripts/capture-rooms.mjs` verifies all themes and mobile selection using simulated plays only.
+`pnpm test`: all wager declarations, demo economy, pending/hash/ack, duplicate prevention, live-payment guard, no-wallet desktop/mobile gameplay, FLIP, shop and reset.
 
-`node scripts/capture-character-visibility.mjs` checks all three rooms at the front table edge and while walking, flipping, animating WIN/LOSE and displaying on mobile, with skateboard, aura and pet equipped. It observes actual canvas draw order and rejects any room-image repaint after the Friend sprite, preventing the older foreground-crop regression.
+`node scripts/test-sdk-host.mjs` with host at localhost:4180 (override RARE_FLIP_TEST_HOST): actual SDK dev host at 2K/10K/100K, WIN/LOSE, auto payout, FLIP and mobile.
 
-ROOM includes the original three props plus GOLD TROPHY (60 FLIP), FRIEND STATUE (75 FLIP) and RETRO RADIO (45 FLIP). PET adds MINT SLIME (105), CLOUD FOX (180), MOON BAT (225) and STAR DRAGON (300 FLIP): three times skateboard (35), beanie (60), crown (75) and aura (100) respectively. One cosmetic pet can be equipped alongside other accessories; it follows the Friend's recorded movement trail, turns horizontally and bobs/hovers while idle. PET's DEMO +500 FLIP button adds simulated shop credit only. Art uses the same transparent PNGs in shop and room. `node scripts/capture-pets-decor.mjs` checks buying, equipping, movement, placement and touch layout.
-
-The preview shop starts with 250 sample FLIP, separate from RF, and adds wager-based FLIP as described above. EQUIP on an owned room decoration opens a six-preset placement picker in the real room. Select a numbered spot for a staged live preview, then PLACE HERE to confirm; CANCEL restores the previous layout and returns to the shop without losing ownership. Occupied spots and the player's footprint are blocked. EQUIP ALL fills available positions without moving existing decorations. REMOVE ALL does not delete ownership. Equipped props appear in the playable room with depth ordering and floor collision. EDIT ROOM still allows mouse/touch dragging or arrow-key placement; SAVE LAYOUT commits changes and CANCEL restores the previous layout. Placement guards reject the table, outside-floor positions and overlapping props/player. `node scripts/capture-placement.mjs` verifies the preset picker on desktop and touch screens.
-
-Costumes now render on the playable Friend and follow movement, idle bobbing and result animations. Headwear shares one HEAD slot; skateboard, wings and aura use separate slots and can be combined. Effects use one independent EFFECTS slot: rising hearts, an orbiting moon, or idle confetti with an extra burst on WIN. They follow the Friend, pause with the scene and respect reduced motion. Inventory and room placement persist while opening/closing the shop in the same game session, not across page reloads. `node scripts/capture-shop.mjs`, `node scripts/capture-room-edit.mjs` and `node scripts/capture-effects.mjs` verify these flows and capture the real local preview.
+`node scripts/test-no-wallet-demo.mjs --pages` after site build checks project-subpath assets. Obsolete 0.1 CLI tests/scripts were replaced; originals remain in Git history and v0.1.0-demo.

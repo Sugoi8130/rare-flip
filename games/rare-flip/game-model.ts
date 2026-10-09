@@ -1,0 +1,11 @@
+import {displayAmount,type FriendArt} from '@rarefriends/friendsdk';
+export type GenerationSprites=FriendArt & {cacheKey:string};
+export const withArtKey=(art:FriendArt):GenerationSprites=>({...art,cacheKey:JSON.stringify(art.frames)});
+export const formatGameAmount=displayAmount;
+export const RF=10n**18n;
+export const definition={price:2000n*RF,outcomes:[{reward:3840n*RF,chanceBps:5000},{reward:0n,chanceBps:5000}]};
+export const maximumPrize=(_:unknown)=>3840n*RF;
+export type GamePlay={id:bigint;outcomeId:number|null};
+export type GameSnapshot={friendId:bigint;rfBalance:bigint;consumables:bigint;freeStake:bigint;inventory:bigint[];plays:GamePlay[];wagerQuantities?:Record<string,bigint>;available?:Record<string,boolean>};
+export type FlipClient={definition:typeof definition;read:()=>Promise<GameSnapshot>;buy:(units:bigint)=>Promise<unknown>;play:(units:bigint)=>Promise<GamePlay[]>;settle:(id:bigint)=>Promise<GamePlay>;redeem:(outcome:number,units:bigint)=>Promise<unknown>};
+export type GameComponentProps={friendId:bigint;client:FlipClient;paused:boolean};

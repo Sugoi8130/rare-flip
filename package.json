@@ -8,13 +8,13 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "node scripts/preview.mjs dev",
-    "build": "node scripts/preview.mjs build",
-    "check": "friendsdk check games/rare-flip",
+    "dev": "friendsdk dev",
+    "build": "friendsdk build",
+    "check": "friendsdk check",
     "test": "node games/rare-flip/test.mjs"
   },
   "dependencies": {
-    "@rarefriends/friendsdk": "https://github.com/spokesz/friendsdk/releases/download/v0.1.4/rarefriends-friendsdk-0.1.4.tgz",
+    "@rarefriends/friendsdk": "github:rarefriends/friendsdk#c19058711f3c207c67cd30b8136de89978f08ddd",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState} from "react";
-import type {GenerationSprites} from "@rarefriends/friendsdk/sprites";
+import type {GenerationSprites} from './game-model';
 import {paintArcade,type Player} from "./scene-renderer";
 import type {RoomId} from "./rooms";
 import type {RoomPositions} from "./room-layout";

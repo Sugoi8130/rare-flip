@@ -1,4 +1,5 @@
-import { spriteFrame, type GenerationSprites, type SpriteFacing } from "@rarefriends/friendsdk/sprites";
+import {spriteFrame,type Facing as SpriteFacing} from '@rarefriends/friendsdk';
+import type {GenerationSprites} from './game-model';
 import { renderRoom, renderArtCoin } from "./artwork";
 import { resultEffects } from "./results";
 import { drawRoomDecoration } from "./shop-art";
@@ -15,7 +16,7 @@ function drawFriend(ctx: CanvasRenderingContext2D, sprites: GenerationSprites, x
   const key = `${sprites.cacheKey}:${facing}:${walking}:${frame}`;
   const cached = friendRasterCache.get(key);
   if (cached) { ctx.imageSmoothingEnabled = false; ctx.drawImage(cached, Math.round(x - scale * 9), Math.round(bottom - scale * 17), scale * 18, scale * 18); return; }
-  const rows = spriteFrame(sprites, facing, walking, frame).frame.rows;
+  const rows = spriteFrame(sprites, facing, walking, frame);
   // Fill enclosed gaps so the body remains solid black, while preserving
   // all spaces connected to the outside (ears, limbs and the silhouette).
   const outside = new Set<number>(), queue: number[] = [];
@@ -80,7 +81,7 @@ export function paintArcade(ctx: CanvasRenderingContext2D, sprites: GenerationSp
     ctx.save();
     if (phase === "result" && !won && !reducedMotion) { ctx.translate(player.x, player.y); ctx.rotate(Math.sin(resultAge / 600) > 0 ? -.055 : .055); ctx.translate(-player.x, -player.y); }
     const frameIndex = reducedMotion ? 0 : Math.floor(now / (player.walking ? 110 : 280)) % 8;
-    const rows = spriteFrame(sprites, player.facing, player.walking, frameIndex).frame.rows;
+    const rows = spriteFrame(sprites, player.facing, player.walking, frameIndex);
     const topRow = Math.max(0, rows.findIndex(row => row.includes("#")));
     const bottom = player.y + bob + celebration, headTop = bottom - 68 + topRow * 4;
     drawFriendCostumes(ctx, costumes, player.x, bottom, headTop, player.facing, now, reducedMotion, "back");

@@ -1,15 +1,14 @@
 import {useEffect,useMemo,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {parseChanceGame} from '@rarefriends/friendsdk/game';
 import RareFlip from './index';
-import definitionJson from './game.json';
+import {definition,withArtKey} from './game-model';
 import {createVariablePreview} from '../../scripts/variable-preview.mjs';
-import sampleSprites from 'rare-flip-demo-sample';
+import {sampleArt} from './sample-art';
 import './demo.css';
 
 // A separate, explicitly labelled sample-art demo. No wallet/provider/identity
 // is injected or claimed, and the normal SDK host entrypoint stays unchanged.
-const definition=parseChanceGame(definitionJson);
+const sampleSprites=withArtKey(sampleArt);
 function Demo(){
  const [session,setSession]=useState(0),[hidden,setHidden]=useState(document.hidden);
  const client=useMemo(()=>createVariablePreview(definition,{friendId:7730n,stake:2_000_000n*10n**18n,rfBalance:200_000n*10n**18n}).client,[session]);

@@ -1,2 +1,3 @@
 allowBuilds:
   esbuild: true
+  '@rarefriends/friendsdk@https://codeload.github.com/rarefriends/friendsdk/tar.gz/c19058711f3c207c67cd30b8136de89978f08ddd': true
